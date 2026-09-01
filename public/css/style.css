@@ -11,6 +11,25 @@ body {
     color: #333;
     line-height: 1.6;
     padding: 20px;
+    margin: 0;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Background image overlay with low opacity */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/images/yawa.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.4;
+    z-index: -1;
 }
 
 /* Header & Typography */
@@ -53,15 +72,16 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Container & Card Layouts */
+
 .container {
     max-width: 1200px;
-    margin: 0 auto;
-    margin-top: 50px;
-    background: #ffffff;
+    margin: 50px auto 0 auto;
+    background: rgba(255, 255, 255, 0.95); /* Slight opacity so the background softly bleeds through */
     padding: 50px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    position: relative;
+    z-index: 1;
 
 }
 

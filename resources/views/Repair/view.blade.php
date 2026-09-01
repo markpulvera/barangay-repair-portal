@@ -49,14 +49,19 @@
                         No Image
                     @endif
                 </td>
-                <td>   
-                            <a href="{{ route('repair.edit', $repair->id) }}">Edit</a>
-                            <form action="{{ route('repair.destroy', $repair->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this report?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit">Delete</button>
-                            </form>
-                        </td>
+                <td>
+    <div style="display: flex; gap: 8px; align-items: center; white-space: nowrap;">
+        <!-- Edit Link -->
+        <a href="{{ route('repair.edit', $repair->id) }}" class="btn btn-primary" style="padding: 6px 12px; background-color: #0d6efd; color: white; text-decoration: none; border-radius: 4px; font-size: 14px;">Edit</a>
+
+        <!-- Delete Form -->
+        <form action="{{ route('repair.destroy', $repair->id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this report?');">
+            @csrf
+            @method('DELETE')
+            <button type="submit" style="padding: 6px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Delete</button>
+        </form>
+    </div>
+</td>
                     </tr>
                 @empty
     <tr>
