@@ -20,7 +20,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Maps root URL directly to index (your dashboard)
+    // Open to all logged-in users (View Dashboard, Form, and Records)
     Route::get('/', [RepairController::class, 'index'])->name('repair.dashboard');
     Route::get('/repair', [RepairController::class, 'index'])->name('repair.dashboard.alt');
     Route::get('/repair/view', [RepairController::class, 'view'])->name('repair.view');
@@ -31,7 +31,10 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:daily-repairs')
         ->name('repair.store');
 
-    Route::get('/repair/{id}/edit', [RepairController::class, 'edit'])->name('repair.edit');
-    Route::put('/repair/{id}', [RepairController::class, 'update'])->name('repair.update');
-    Route::delete('/repair/{id}', [RepairController::class, 'destroy'])->name('repair.destroy');
+    // Admin-only management routes (Edit & Delete Access)
+    Route::middleware('admin')->group(function () {
+        Route::get('/repair/{id}/edit', [RepairController::class, 'edit'])->name('repair.edit');
+        Route::put('/repair/{id}', [RepairController::class, 'update'])->name('repair.update');
+        Route::delete('/repair/{id}', [RepairController::class, 'destroy'])->name('repair.destroy');
+    });
 });

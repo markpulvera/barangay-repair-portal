@@ -12,7 +12,6 @@
         <h1>Barangay Infrastructure Repair Portal</h1>
     </header>
 
-
     <main>
         <section>
             <h2>Welcome Residents</h2>
@@ -29,9 +28,15 @@
         </section>
 
         <br>
-        <a href="{{ route('repair.create') }}">
-            <button type="button">File a Repair Request</button>
-        </a>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <a href="{{ route('repair.create') }}">
+                <button type="button">File a Repair Request</button>
+            </a>
+
+            <a href="{{ route('repair.view') }}">
+                <button type="button" style="background-color: #6c757d; color: white; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer;">View All Reports</button>
+            </a>
+        </div>
     </main>
 </div>
 </body>
