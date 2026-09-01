@@ -36,6 +36,14 @@
             <a href="{{ route('repair.view') }}">
                 <button type="button" style="background-color: #6c757d; color: white; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer;">View All Reports</button>
             </a>
+
+            <!-- Logout Button -->
+            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                @csrf
+                <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    Logout
+                </button>
+            </form>
         </div>
     </main>
 </div>

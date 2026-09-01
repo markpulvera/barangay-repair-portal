@@ -36,5 +36,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/repair/{id}/edit', [RepairController::class, 'edit'])->name('repair.edit');
         Route::put('/repair/{id}', [RepairController::class, 'update'])->name('repair.update');
         Route::delete('/repair/{id}', [RepairController::class, 'destroy'])->name('repair.destroy');
+
+
+
+    Route::post('/repair/logout', [RepairController::class, 'logout'])->name('logout');
+
     });
 });
