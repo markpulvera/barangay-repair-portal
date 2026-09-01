@@ -12,7 +12,7 @@ class AppServiceProvider extends ServiceProvider
    public function boot(): void
 {
     RateLimiter::for('daily-repairs', function (Request $request) {
-        return Limit::perDay(50)->by($request->ip());
+        return Limit::perDay(2)->by($request->ip());
         });
     }
 }
