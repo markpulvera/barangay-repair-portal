@@ -218,3 +218,30 @@ button:hover, .btn:hover {
     color: #9b2c2c;
     background: none;
 }
+
+ .main-card {
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            padding: 30px;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+        .portal-header { color: #0F2C59; font-weight: 700; }
+        .stats-card {
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #F8FAFC;
+            text-align: center;
+        }
+        .stats-number { font-size: 1.8rem; font-weight: bold; }
+        .table-custom thead { background-color: #1D5D9B; color: #ffffff; }
+        .table-custom th { font-size: 0.85rem; text-transform: uppercase; padding: 12px; }
+        .confidential-badge {
+            font-size: 0.75rem;
+            background-color: #6c757d;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }

@@ -2,18 +2,31 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Repair extends Model
 {
+    use HasFactory;
+
+    // Explicitly set singular table name matching your migration
     protected $table = 'repair';
+
     protected $fillable = [
+        'user_id',
         'Reporter_name',
-        'Location_landmark',
-        'Contact_number',
+        'Location_landmark',    
+        'Risk_level',
         'Facility_type',
         'Damage_description',
         'Date_observed',
-        'image',
+        'Image',
+        'Status',
+        'Assigned_department',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

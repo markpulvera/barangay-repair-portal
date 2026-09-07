@@ -11,41 +11,52 @@ class RepairController extends Controller
 {
     // READ: Dashboard / Home landing page
     public function index()
-    {
-        return view('repair.index'); 
+{
+    // If an admin navigates to the resident dashboard, push them to the admin portal
+    if (Auth::user()->role === 'admin') {
+        return redirect()->route('admin.dashboard');
     }
+
+    return view('repair.index'); // Resident dashboard view
+}
 
     // CREATE: Form view
     public function create() 
-    {
-        return view('repair.create');
+{
+    if (Auth::user()->role === 'admin') {
+        return redirect()->route('admin.dashboard')->with('error', 'Administrators cannot file reports. Use the admin panel to manage records.');
     }
 
+    return view('repair.create');
+}
+
     // STORE: Open to all logged-in users to submit reports
-    public function store(Request $request)
+   public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'Reporter_name'      => 'required',
             'Location_landmark'  => 'required',
-            'Contact_number'     => 'required',
+            'Risk_level'         => 'required',
             'Facility_type'      => 'required',
             'Damage_description' => 'required',
             'Date_observed'      => 'required',
-            'image'              => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'Image'              => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         $data = [
+            'user_id'            => Auth::id(), // Attaches the currently logged-in user's ID
             'Reporter_name'      => $request->input('Reporter_name'),
             'Location_landmark'  => $request->input('Location_landmark'),
-            'Contact_number'     => $request->input('Contact_number'),
+            'Risk_level'         => $request->input('Risk_level'),
             'Facility_type'      => $request->input('Facility_type'),
             'Damage_description' => $request->input('Damage_description'),
             'Date_observed'      => $request->input('Date_observed'),
-            'image'              => null,
+            'Image'              => null,
+            'Status'             => 'Pending', // Default status upon creation
         ];
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('repairs', 'public');
+        if ($request->hasFile('Image')) {
+            $data['Image'] = $request->file('Image')->store('repairs', 'public');
         }
 
         Repair::create($data);
@@ -53,71 +64,112 @@ class RepairController extends Controller
         return redirect()->route('repair.view')->with('success', 'Report saved successfully!');
     }
 
+
     // VIEW: Accessible by all users to view records
     public function view() 
     {
-        $repairs = Repair::all();
-        return view('repair.view', compact('repairs'));
+        $repairs = Repair::all();  // kwaon sa database ang tanan nga repair records
+        return view('repair.view', compact('repairs')); 
+    }              
+
+    // ADMIN DASHBOARD: Display triage counters & complete case list
+    public function adminDashboard()
+    {
+
+        // Calculate statistics based on status
+        $pendingCount = Repair::where('Status', 'Pending')->orWhereNull('Status')->count();
+        $inProgressCount = Repair::where('Status', 'In Progress')->count();
+        $resolvedTodayCount = Repair::where('Status', 'Resolved')
+            ->whereDate('updated_at', now()->today())
+            ->count();
+
+        // Get all repair records ordered by newest first
+        $repairs = Repair::orderBy('created_at', 'desc')->get();
+
+        return view('admin.dashboard', compact(
+            'repairs',
+            'pendingCount',
+            'inProgressCount',
+            'resolvedTodayCount'
+        ));
+    }
+
+    // ADMIN STATUS UPDATE: Quick update for status, risk level, and department assignment
+    public function updateStatus(Request $request, $id)
+    {
+
+        $request->validate([
+            'Status'              => 'required|in:Pending,In Progress,Resolved',
+            'Risk_level'          => 'required|in:Low,Medium,High,Critical',
+            'Assigned_department' => 'required|string|max:255',
+        ]);
+
+        $repair = Repair::findOrFail($id);
+        $repair->update([
+            'Status'              => $request->Status,
+            'Risk_level'          => $request->Risk_level,
+            'Assigned_department' => $request->Assigned_department,
+        ]);
+
+        return redirect()->back()->with('success', 'Case #' . $id . ' status updated successfully!');
     }
 
     // EDIT: Restricted to Admin
     public function edit($id) 
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized action. Only administrators can edit records.');
-        }
 
         $repair = Repair::findOrFail($id);
         return view('repair.update', compact('repair'));
     }
 
     // UPDATE: Restricted to Admin
-    public function update(Request $request, $id)
-    {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized action. Only administrators can update records.');
+   public function update(Request $request, $id)
+{
+    $repair = Repair::findOrFail($id);
+
+    $data = $request->validate([
+        'Reporter_name'      => 'required',
+        'Location_landmark'  => 'required',
+        'Risk_level'         => 'required',
+        'Facility_type'      => 'required',
+        'Damage_description' => 'required',
+        'Date_observed'      => 'required',
+        'Image'              => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+    ]);
+
+    if ($request->hasFile('Image')) {
+        // Delete old image if present
+        if ($repair->Image && Storage::disk('public')->exists($repair->Image)) {
+            Storage::disk('public')->delete($repair->Image);
         }
 
-        $repair = Repair::findOrFail($id);
-
-        $data = $request->validate([
-            'Reporter_name'      => 'required',
-            'Location_landmark'  => 'required',
-            'Contact_number'     => 'required|numeric',
-            'Facility_type'      => 'required',
-            'Damage_description' => 'required',
-            'Date_observed'      => 'required',
-            'image'              => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
-        ]);
-
-        if ($request->hasFile('image')) {
-            if ($repair->image && Storage::disk('public')->exists($repair->image)) {
-                Storage::disk('public')->delete($repair->image);
-            }
-
-            $data['image'] = $request->file('image')->store('repairs', 'public');
-        }
-
-        $repair->update($data);
-
-        return redirect()->route('repair.view')->with('success', 'Report updated successfully!');
+        // Store new image using capital 'Image' key
+        $data['Image'] = $request->file('Image')->store('repairs', 'public');
+    } else {
+        // Prevent overwriting existing image with null if no new file is uploaded
+        unset($data['Image']);
     }
 
+    $repair->update($data);
+
+    return redirect()->route('admin.dashboard')->with('success', 'Report updated successfully!');
+}
     // DELETE: Restricted to Admin
-    public function destroy($id)
-    {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized action. Only administrators can delete records.');
-        }
+   public function destroy($id)
+{
+    $repair = Repair::findOrFail($id);
+    $repair->delete(); // Ensure this line exists and is executed
 
-        $repair = Repair::findOrFail($id);
+    return redirect()->route('admin.dashboard')->with('success', 'Report deleted successfully!');
+}
+    public function show($id)
+{
+    $repair = Repair::find($id);
 
-        if ($repair->image && Storage::disk('public')->exists($repair->image)) {
-            Storage::disk('public')->delete($repair->image);
-        }
+    if (!$repair) {
+        return redirect()->route('admin.dashboard')->with('error', 'That report no longer exists.');
+    }
 
-        $repair->delete();
-
-        return redirect()->route('repair.view')->with('success', 'Report deleted successfully!');
-    } 
+    return view('admin.repair.show', compact('repair'));
+}
 }

@@ -19,8 +19,12 @@
         <label>Location / Landmark:</label><br>
         <input type="text" name="Location_landmark" value="{{ old('Location_landmark', $repair->Location_landmark) }}" required><br><br>
 
-        <label>Contact Number:</label><br>
-        <input type="text" name="Contact_number" value="{{ old('Contact_number', $repair->Contact_number) }}" required><br><br>
+        <label>Risk Level:</label>
+        <select name="Risk_level" required>
+            <option value="Low" {{ old('Risk_level', $repair->Risk_level) == 'Low' ? 'selected' : '' }}>Low</option>
+            <option value="Medium" {{ old('Risk_level', $repair->Risk_level) == 'Medium' ? 'selected' : '' }}>Medium</option>
+            <option value="High" {{ old('Risk_level', $repair->Risk_level) == 'High' ? 'selected' : '' }}>High</option>
+        </select><br>
 
         <label>Facility Type:</label><br>
         <select name="Facility_type" required>
@@ -37,11 +41,19 @@
         <label>Date Observed:</label><br>
         <input type="date" name="Date_observed" value="{{ old('Date_observed', $repair->Date_observed) }}" required><br><br>
         
-        <label>Upload Damage Photo:</label>
-        <input type="file" name="image" id="image"><br><br>
+        <form action="{{ route('repair.update', $repair->id) }}" method="POST" enctype="multipart/form-data">
+    @csrf
+    @method('PUT')
 
-        <button type="submit">Update Report</button>
-        <a href="{{ route('repair.view') }}">Cancel</a>
+    <div class="form-group">
+        <label>Upload Evidence Image: </label>
+        <input type="file" name="Image" class="form-control">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>
+
+        <a href="{{ route('admin.dashboard') }}">Cancel</a>
     </form>
     
    

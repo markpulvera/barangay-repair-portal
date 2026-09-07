@@ -30,8 +30,12 @@
     <label>Location:</label>
     <input type="text" name="Location_landmark" placeholder="Landmark" required><br>
 
-    <label>Contact Number:</label>
-    <input type="number" name="Contact_number" placeholder="09594752163" required><br>
+    <label>Risk Level:</label>
+    <select name="Risk_level" required>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+    </select><br>
 
     <label>Facility Type:</label>
     <select name="Facility_type" required>
@@ -47,8 +51,8 @@
     <label>Date Observed:</label>
     <input type="date" name="Date_observed" required><br>
 
-    <label>Damage Photo:</label>
-    <input type="file" name="image" id="image"><br>
+    <label>Upload Evidence Image: </label>
+    <input type="file" name="Image" accept="image/*">
 
     <button type="submit">Submit Report</button>
 </form>

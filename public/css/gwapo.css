@@ -1,0 +1,318 @@
+
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #f1f5f9;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #334155;
+    padding: 20px;
+}
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/images/yawa.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.4;
+    z-index: -1;
+}
+
+.portal-container {
+    width: 100%;
+}
+
+.main-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+/* Header & Right-Aligned Logout Button */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.portal-header {
+    color: #1e3a8a;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.header-subtitle {
+    color: #64748b;
+    font-size: 0.85rem;
+    display: block;
+    margin-top: 2px;
+}
+
+.header-user-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #1e293b;
+}
+
+.btn-logout {
+    background-color: #dc2626;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-logout:hover {
+    background-color: #b91c1c;
+}
+
+/* Stats Cards (Grid Side by Side) */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stats-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.25rem;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-grey-1 { border-top: 4px solid #94a3b8; }
+.card-grey-2 { border-top: 4px solid #64748b; }
+.card-blue-1 { border-top: 4px solid #3b82f6; }
+.card-blue-2 { border-top: 4px solid #1d4ed8; }
+
+.stats-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.stats-number {
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 0.25rem;
+}
+
+/* Table Design & Matching Blue Header */
+.table-title {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 0.875rem;
+}
+
+/* Matched Blue header color from 2nd image (#2f6bb2) */
+.table-custom thead th {
+    background-color: #2f6bb2;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.85rem;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    border: none;
+}
+
+.table-custom td {
+    padding: 0.85rem 0.6rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.table-custom tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Larger Styled Action Buttons */
+.actions-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.825rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-status {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+.btn-status:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-modify {
+    background-color: #64748b;
+    color: #ffffff;
+}
+
+.btn-modify:hover {
+    background-color: #475569;
+}
+
+.btn-delete {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.btn-delete:hover {
+    background-color: #b91c1c;
+}
+
+/* Badges & Text Helpers */
+.confidential-badge {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.badge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-facility { background-color: #e0f2fe; color: #0369a1; }
+.badge-risk.critical { background-color: #fee2e2; color: #991b1b; }
+.badge-risk.high { background-color: #fef3c7; color: #92400e; }
+.badge-risk.medium, .badge-risk.low { background-color: #f1f5f9; color: #475569; }
+
+.badge-status.resolved { background-color: #dcfce7; color: #166534; }
+.badge-status.in-progress { background-color: #dbeafe; color: #1e40af; }
+.badge-status.pending { background-color: #fef3c7; color: #92400e; }
+
+.text-start { text-align: left; }
+.fw-bold { font-weight: 700; }
+.desc-text { font-size: 0.78rem; color: #64748b; margin-top: 2px; }
+.small-text { font-size: 0.78rem; }
+.evidence-img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; }
+.empty-cell { padding: 2rem; color: #64748b; }
+
+.alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+}
+
+/* Modal Styling */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-card {
+    background: #ffffff;
+    border-radius: 8px;
+    width: 450px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.modal-close {
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: #64748b;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.875rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}

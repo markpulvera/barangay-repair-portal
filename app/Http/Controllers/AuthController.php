@@ -23,32 +23,38 @@ class AuthController extends Controller
     }
 
     // Handle Google Callback
-    public function handleGoogleCallback()
-    {
-        try {
-            $googleUser = Socialite::driver('google')->user();
+   public function handleGoogleCallback()
+{
+    try {
+        $googleUser = Socialite::driver('google')->user();
 
-            $user = User::firstOrCreate(
-                ['email' => $googleUser->getEmail()],
-                [
-                    'name' => $googleUser->getName(),
-                    'google_id' => $googleUser->getId(),
-                    'password' => bcrypt(str()->random(16)),
-                ]
-            );
+        $user = User::firstOrCreate(
+            ['email' => $googleUser->getEmail()],
+            [
+                'name' => $googleUser->getName(),
+                'google_id' => $googleUser->getId(),
+                'password' => bcrypt(str()->random(16)),
+                'role' => 'user', // Default role for new users
+            ]
+        );
 
-            if (!$user->google_id) {
-                $user->update(['google_id' => $googleUser->getId()]);
-            }
-
-            Auth::login($user);
-
-            return redirect()->route('repair.dashboard');
-
-        } catch (Exception $e) {
-            return redirect()->route('login')->withErrors(['error' => 'Google Authentication Failed.']);
+        if (!$user->google_id) {
+            $user->update(['google_id' => $googleUser->getId()]);
         }
+
+        Auth::login($user);
+
+        // Redirect based on user role
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('repair.dashboard');
+
+    } catch (Exception $e) {
+        return redirect()->route('login')->withErrors(['error' => 'Google Authentication Failed.']);
     }
+}
 
     // Handle Phone Number Login
     public function loginWithPhone(Request $request)
@@ -66,6 +72,7 @@ class AuthController extends Controller
                 'name' => 'Resident (' . substr($phone, -4) . ')',
                 'email' => $phone . '@barangay.local',
                 'password' => bcrypt(str()->random(16)),
+                'role' => 'user',
             ]
         );
 
