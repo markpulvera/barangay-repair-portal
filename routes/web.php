@@ -33,6 +33,10 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:daily-repairs')
         ->name('repair.store');
 
+    Route::get('/api-demo', function () {
+    return view('api_demo');
+});
+
     // 3. ADMIN-ONLY MANAGEMENT ROUTES (Restricted to Admin Role)
     Route::middleware(['auth', 'admin'])->group(function () {
     Route::patch('/admin/users/{user}/role', [AdminUserController::class, 'updateRole'])->name('admin.users.updateRole');
