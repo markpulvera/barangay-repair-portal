@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barangay Admin Portal - Management Dashboard</title>
     <link rel="stylesheet" href="{{ asset('css/gwapo.css') }}">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .admin-map { height: 150px; width: 100%; border-radius: 6px; margin-top: 5px; }
+    </style>
 </head>
 <body>
 
@@ -59,13 +64,13 @@
                     <tr>
                         <th>Case ID</th>
                         <th>Reporter Info <span class="confidential-badge">Private</span></th>
-                        <th>Location</th>
+                        <th>Location & Map Pin</th>
                         <th>Facility & Description</th>
                         <th>Risk Level</th>
                         <th>Assigned Dept</th>
                         <th>Status</th>
                         <th>Logged Date</th>
-                        <th>Evidence</th>
+                        <th>Evidence / Proof</th>
                         <th>Admin Actions</th>
                     </tr>
                 </thead>
@@ -76,7 +81,29 @@
                         <td class="text-start">
                             <strong>{{ $repair->Reporter_name }}</strong>
                         </td>
-                        <td>{{ $repair->Location_landmark }}</td>
+                        <td>
+                            {{ $repair->Location_landmark }}
+                            @if($repair->latitude && $repair->longitude)
+                                <div id="admin-map-{{ $repair->id }}" class="admin-map"></div>
+                                <script>
+                                    document.addEventListener("DOMContentLoaded", function() {
+                                        var map = L.map('admin-map-{{ $repair->id }}', {
+                                            zoomControl: false,
+                                            dragging: false,
+                                            scrollWheelZoom: false
+                                        }).setView([{{ $repair->latitude }}, {{ $repair->longitude }}], 15);
+
+                                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                            maxZoom: 19
+                                        }).addTo(map);
+
+                                        L.marker([{{ $repair->latitude }}, {{ $repair->longitude }}]).addTo(map);
+                                    });
+                                </script>
+                            @else
+                                <br><small class="text-muted">No GPS coordinates pinned</small>
+                            @endif
+                        </td>
                         <td class="text-start">
                             <span class="badge badge-facility">{{ $repair->Facility_type }}</span>
                             <div class="desc-text">{{ $repair->Damage_description }}</div>
@@ -94,14 +121,26 @@
                         </td>
                         <td class="small-text">{{ $repair->Date_observed }}</td>
                         <td>
-                    @if($repair->Image)
-                        <a href="{{ asset('storage/' . $repair->Image) }}" target="_blank">
-                            <img src="{{ asset('storage/' . $repair->Image) }}" style="width: 80px; height: 80px; object-fit: cover;">
-                        </a>
-                    @else
-                        No Image
-                    @endif
-                </td>
+                            <div>
+                                <small><strong>Initial:</strong></small><br>
+                                @if($repair->Image)
+                                    <a href="{{ asset('storage/' . $repair->Image) }}" target="_blank">
+                                        <img src="{{ asset('storage/' . $repair->Image) }}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 4px;">
+                                    </a>
+                                @else
+                                    <span class="text-muted">No Image</span>
+                                @endif
+                            </div>
+                            <div style="margin-top: 6px;">
+                                <small><strong>Proof (Fixed):</strong></small><br>
+                                @if($repair->proof_image)
+                                    <a href="{{ asset('storage/' . $repair->proof_image) }}" target="_blank">
+                                        <img src="{{ asset('storage/' . $repair->proof_image) }}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 2px solid #198754;">
+                                    </a>
+                                @else
+                                    <span class="text-muted">Pending Proof</span>
+                                @endif
+                            </div>
                         </td>
                         <td>
                             <div class="actions-group">
@@ -116,14 +155,13 @@
                                 <!-- Role Selector Dropdown -->
                                 @if($repair->user_id)
                                     <form action="{{ route('admin.users.updateRole', $repair->user_id) }}" method="POST" style="display:inline;">
-    @csrf
-    @method('PATCH')
-    
-    <select name="role" onchange="this.form.submit()" class="form-select form-select-sm">
-        <option value="resident" {{ in_array($repair->user->role ?? '', ['resident', 'user']) ? 'selected' : '' }}>Resident</option>
-        <option value="admin" {{ ($repair->user->role ?? '') === 'admin' ? 'selected' : '' }}>Admin</option>
-    </select>
-</form>
+                                        @csrf
+                                        @method('PATCH')
+                                        <select name="role" onchange="this.form.submit()" class="form-select form-select-sm">
+                                            <option value="resident" {{ in_array($repair->user->role ?? '', ['resident', 'user']) ? 'selected' : '' }}>Resident</option>
+                                            <option value="admin" {{ ($repair->user->role ?? '') === 'admin' ? 'selected' : '' }}>Admin</option>
+                                        </select>
+                                    </form>
                                 @else
                                     <span class="text-muted small">No User ID</span>
                                 @endif
@@ -141,11 +179,10 @@
                     <!-- STATUS & TRIAGE MODAL -->
                     <div id="updateModal{{ $repair->id }}" class="modal-overlay" style="display: none;">
                         <div class="modal-card">
-                            <form action="{{ route('admin.repair.updateStatus', $repair->id) }}" method="POST">
+                            <form action="{{ route('admin.repair.updateStatus', $repair->id) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
-                                @method('PATCH')
                                 <div class="modal-header">
-                                    <h4>Update Status — Case #{{ $repair->id }}</h4>
+                                    <h4>Update Status & Proof — Case #{{ $repair->id }}</h4>
                                     <span class="modal-close" onclick="document.getElementById('updateModal{{ $repair->id }}').style.display='none'">&times;</span>
                                 </div>
                                 <div class="modal-body">
@@ -170,6 +207,11 @@
                                             <option value="Resolved" {{ $repair->Status == 'Resolved' ? 'selected' : '' }}>Resolved</option>
                                         </select>
                                     </div>
+                                    <div class="form-group" style="margin-top: 10px;">
+                                        <label>Upload Proof Image (After Repair):</label>
+                                        <input type="file" name="proof_image" class="form-control" accept="image/*">
+                                        <small class="text-muted">Upload evidence showing the problem is fixed.</small>
+                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-modify" onclick="document.getElementById('updateModal{{ $repair->id }}').style.display='none'">Close</button>
@@ -189,5 +231,7 @@
     </div>
 </div>
 
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </body>
 </html>

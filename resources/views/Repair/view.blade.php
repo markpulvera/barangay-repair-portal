@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report Records - Barangay Portal</title>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-
 </head>
 <body>
 
@@ -15,7 +14,6 @@
         <div class="mb-4">
             <a href="{{ route('repair.dashboard') }}" class="text-decoration-none me-2">Dashboard</a> | 
             <a href="{{ route('repair.create') }}" class="text-decoration-none ms-2 me-2">Create Request</a>
-
         </div>
 
         <div class="table-responsive">
@@ -29,7 +27,8 @@
                         <th>Damage Description</th>
                         <th>Date Observed</th>
                         <th>Status</th>
-                        <th>Image</th>
+                        <th>Initial Image</th>
+                        <th>Proof of Repair</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,18 +48,28 @@
                             </span>
                         </td>
                         <td>
-                    @if($repair->Image)
-                        <a href="{{ asset('storage/' . $repair->Image) }}" target="_blank">
-                            <img src="{{ asset('storage/' . $repair->Image) }}" style="width: 80px; height: 80px; object-fit: cover;">
-                        </a>
-                    @else
-                        No Image
-                    @endif
-                </td>
+                            @if($repair->Image)
+                                <a href="{{ asset('storage/' . $repair->Image) }}" target="_blank">
+                                    <img src="{{ asset('storage/' . $repair->Image) }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
+                                </a>
+                            @else
+                                No Image
+                            @endif
+                        </td>
+                        <td>
+                            @if($repair->proof_image)
+                                <a href="{{ asset('storage/' . $repair->proof_image) }}" target="_blank">
+                                    <img src="{{ asset('storage/' . $repair->proof_image) }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 2px solid #198754;" title="Proof of Repair">
+                                </a>
+                                <br><small style="color: #198754; font-weight: bold;">Fixed Proof</small>
+                            @else
+                                <span class="text-muted">Awaiting Repair</span>
+                            @endif
+                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center py-4 text-muted">No repair records found.</td>
+                        <td colspan="9" class="text-center py-4 text-muted">No repair records found.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -68,7 +77,6 @@
         </div>
     </div>
 </div>
-
 
 </body>
 </html>

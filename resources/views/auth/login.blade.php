@@ -29,14 +29,14 @@
         </div>
 
         <!-- Phone Number Login Form -->
-        <form action="{{ route('login.phone') }}" method="POST" style="text-align: left;">
-            @csrf
-            <div>
-                <label for="phone_number">Mobile Phone Number:</label>
-                <input type="text" name="phone_number" id="phone_number" placeholder="09123456789" required>
-            </div>
-            <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Log In with Phone</button>
-        </form>
+    <form action="{{ route('login.otp.send') }}" method="POST" style="text-align: left;">
+    @csrf
+    <div>
+            <label for="phone_number">Mobile Phone Number:</label>
+            <input type="text" name="phone_number" id="phone_number" placeholder="09123456789" required>
+        </div>
+        <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Send Verification Code</button>
+    </form>
     </div>
 </body>
 </html>

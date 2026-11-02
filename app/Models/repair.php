@@ -15,7 +15,9 @@ class Repair extends Model
     protected $fillable = [
         'user_id',
         'Reporter_name',
-        'Location_landmark',    
+        'Location_landmark',  
+        'latitude',
+        'longitude',  
         'Risk_level',
         'Facility_type',
         'Damage_description',
@@ -23,6 +25,7 @@ class Repair extends Model
         'Image',
         'Status',
         'Assigned_department',
+        'proof_image',
     ];
 
     public function user()

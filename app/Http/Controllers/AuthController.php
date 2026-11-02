@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use Exception;
 
@@ -23,49 +25,78 @@ class AuthController extends Controller
     }
 
     // Handle Google Callback
-   public function handleGoogleCallback()
-{
-    try {
-        $googleUser = Socialite::driver('google')->user();
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
 
-        $user = User::firstOrCreate(
-            ['email' => $googleUser->getEmail()],
-            [
-                'name' => $googleUser->getName(),
-                'google_id' => $googleUser->getId(),
-                'password' => bcrypt(str()->random(16)),
-                'role' => 'user', // Default role for new users
-            ]
-        );
+            $user = User::firstOrCreate(
+                ['email' => $googleUser->getEmail()],
+                [
+                    'name' => $googleUser->getName(),
+                    'google_id' => $googleUser->getId(),
+                    'password' => bcrypt(str()->random(16)),
+                    'role' => 'user', // Default role for new users
+                ]
+            );
 
-        if (!$user->google_id) {
-            $user->update(['google_id' => $googleUser->getId()]);
+            if (!$user->google_id) {
+                $user->update(['google_id' => $googleUser->getId()]);
+            }
+
+            Auth::login($user);
+
+            // Redirect based on user role
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+
+            return redirect()->route('repair.dashboard');
+
+        } catch (Exception $e) {
+            return redirect()->route('login')->withErrors(['error' => 'Google Authentication Failed.']);
         }
-
-        Auth::login($user);
-
-        // Redirect based on user role
-        if ($user->role === 'admin') {
-            return redirect()->route('admin.dashboard');
-        }
-
-        return redirect()->route('repair.dashboard');
-
-    } catch (Exception $e) {
-        return redirect()->route('login')->withErrors(['error' => 'Google Authentication Failed.']);
     }
-}
 
-    // Handle Phone Number Login
-    public function loginWithPhone(Request $request)
+    // Step 1: Request OTP
+    public function sendPhoneOtp(Request $request)
     {
         $request->validate([
-            'phone_number' => 'required|string',
+            'phone_number' => ['required', 'string', 'regex:/^09[0-9]{9}$/'],
         ]);
 
         $phone = $request->input('phone_number');
+        $otp = rand(100000, 999999);
 
-        // Find or create user by phone number
+        // Store OTP in cache for 5 minutes
+        Cache::put('otp_' . $phone, $otp, now()->addMinutes(5));
+
+        // Log for record-keeping
+        Log::info("OTP for {$phone}: {$otp}");
+
+        // Flash code directly into the success message for smooth presentation demo
+        return redirect()->route('login.otp.verify', ['phone' => $phone])
+            ->with('success', 'Verification code generated successfully! [DEMO CODE: ' . $otp . ']');
+    }
+
+    // Step 2: Verify OTP and Login
+    public function verifyPhoneOtp(Request $request)
+    {
+        $request->validate([
+            'phone_number' => 'required|string',
+            'otp' => 'required|string|size:6',
+        ]);
+
+        $phone = $request->input('phone_number');
+        $cachedOtp = Cache::get('otp_' . $phone);
+
+        if (!$cachedOtp || (string)$cachedOtp !== (string)$request->input('otp')) {
+            return back()->withErrors(['otp' => 'Invalid or expired verification code.']);
+        }
+
+        // Clear the OTP from cache so it can't be reused
+        Cache::forget('otp_' . $phone);
+
         $user = User::firstOrCreate(
             ['phone_number' => $phone],
             [
@@ -78,7 +109,11 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('repair.dashboard')->with('success', 'Logged in successfully!');
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('repair.dashboard')->with('success', 'Logged in successfully via OTP!');
     }
 
     // Logout
@@ -90,7 +125,4 @@ class AuthController extends Controller
 
         return redirect()->route('login');
     }
-
-
-
 }
