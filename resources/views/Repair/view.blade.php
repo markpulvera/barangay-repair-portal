@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report Records - Barangay Portal</title>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <style>
+        .table-custom tbody td {
+            font-family: "Times New Roman", Times, serif;
+        }
+        .table-custom tbody td.location-cell,
+        .table-custom tbody td.facility-cell,
+        .table-custom tbody td.status-cell {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 
@@ -12,7 +22,7 @@
     <div class="main-card">
         <h2 class="portal-header mb-1">Report Records</h2>
         <div class="mb-4">
-            <a href="{{ route('repair.dashboard') }}" class="text-decoration-none me-2">Dashboard</a> | 
+            <a href="{{ route('repair.dashboard') }}" class="text-decoration-none me-2">Dashboard</a> |
             <a href="{{ route('repair.create') }}" class="text-decoration-none ms-2 me-2">Create Request</a>
         </div>
 
@@ -35,14 +45,14 @@
                     @forelse($repairs as $repair)
                     <tr>
                         <td>{{ $repair->Reporter_name }}</td>
-                        <td>{{ $repair->Location_landmark }}</td>
-                        <td>{{ $repair->Facility_type }}</td>
+                        <td class="location-cell">{{ $repair->Location_landmark }}</td>
+                        <td class="facility-cell">{{ $repair->Facility_type }}</td>
                         <td>
                             <span class="badge bg-secondary">{{ $repair->Risk_level }}</span>
                         </td>
                         <td>{{ $repair->Damage_description }}</td>
                         <td>{{ $repair->Date_observed }}</td>
-                        <td>
+                        <td class="status-cell">
                             <span class="badge {{ $repair->Status == 'Resolved' ? 'bg-success' : ($repair->Status == 'In Progress' ? 'bg-primary' : 'bg-warning text-dark') }}">
                                 {{ $repair->Status ?? 'Pending' }}
                             </span>

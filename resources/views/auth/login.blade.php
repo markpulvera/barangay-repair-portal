@@ -31,10 +31,20 @@
         <!-- Phone Number Login Form -->
     <form action="{{ route('login.otp.send') }}" method="POST" style="text-align: left;">
     @csrf
-    <div>
-            <label for="phone_number">Mobile Phone Number:</label>
-            <input type="text" name="phone_number" id="phone_number" placeholder="09123456789" required>
-        </div>
+    <div style="width: 100%; box-sizing: border-box; padding: 10px;">
+    <label for="phone_number">Mobile Phone Number:</label>
+    <input
+        type="tel"
+        name="phone_number"
+        id="phone_number"
+        placeholder="09123456789"
+        pattern="[0-9]*"
+        inputmode="numeric"
+        maxlength="11"
+        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+        style="width: 100%; box-sizing: border-box; padding: 10px; border: 2px solid;"
+        required>
+</div>
         <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Send Verification Code</button>
     </form>
     </div>

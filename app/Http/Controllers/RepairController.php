@@ -21,7 +21,7 @@ class RepairController extends Controller
     }
 
     // CREATE: Form view
-    public function create() 
+    public function create()
     {
         if (Auth::user()->role === 'admin') {
             return redirect()->route('admin.dashboard')->with('error', 'Administrators cannot file reports. Use the admin panel to manage records.');
@@ -33,7 +33,7 @@ class RepairController extends Controller
     // STORE: Open to all logged-in users to submit reports
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'Reporter_name'      => 'required',
             'Location_landmark'  => 'required',
             'latitude'           => 'nullable|numeric',
@@ -69,11 +69,11 @@ class RepairController extends Controller
     }
 
     // VIEW: Accessible by all users to view records
-    public function view() 
+    public function view()
     {
         $repairs = Repair::all();  // kwaon sa database ang tanan nga repair records
-        return view('repair.view', compact('repairs')); 
-    }              
+        return view('repair.view', compact('repairs'));
+    }
 
     // ADMIN DASHBOARD: Display triage counters & complete case list
     public function adminDashboard()
@@ -128,7 +128,7 @@ class RepairController extends Controller
     }
 
     // EDIT: Restricted to Admin
-    public function edit($id) 
+    public function edit($id)
     {
         $repair = Repair::findOrFail($id);
         return view('repair.update', compact('repair'));
